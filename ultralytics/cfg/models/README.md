@@ -55,6 +55,22 @@ Ultralytics supports a variety of model architectures. Visit the [Ultralytics Mo
 
 You can easily use any of these models by loading their configuration files (`.yaml`) or their [pre-trained](https://docs.pytorch.org/tutorials/beginner/transfer_learning_tutorial.html) checkpoints (`.pt`).
 
+### timm backbones
+
+Install `pip install 'ultralytics[timm]'` to use a [timm](https://huggingface.co/docs/timm/en/feature_extraction)
+backbone. For example, [`examples/yolo11-timm-convnext.yaml`](../../../examples/yolo11-timm-convnext.yaml) uses
+ConvNeXt-Tiny feature maps at strides 8, 16, and 32 for detection. Set the `Timm` layer's `pretrained` argument to `True` to download pretrained backbone weights; the example
+defaults to `False` so it can be built offline. To swap backbones, choose a timm model that supports `features_only`,
+and update its `out_indices` and the `Index` layer channel counts to match `model.feature_info.channels()` and
+`model.feature_info.reduction()`. For example, EfficientNet-B0 uses indices `[2, 3, 4]` with channels `[40, 112, 320]`.
+
+```python
+from ultralytics import YOLO
+
+model = YOLO("examples/yolo11-timm-convnext.yaml")
+model.train(data="coco8.yaml", epochs=100)
+```
+
 ## 🤝 Contribute New Models
 
 Have you developed a novel YOLO variant, experimented with a unique architecture, or achieved state-of-the-art results through specific tuning? We encourage you to share your innovations with the community by contributing to our Models section! Contributions like new model configurations, architectural improvements, or performance optimizations are highly valuable and help enrich the Ultralytics ecosystem.
