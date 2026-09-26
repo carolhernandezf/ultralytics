@@ -1,0 +1,22 @@
+# Ultralytics detection model with an EfficientViT-B0 backbone, FPN neck, and dual-branch Detect head
+# Install with: pip install 'ultralytics[timm]'
+
+nc: 80
+reg_max: 1
+end2end: True
+
+backbone:
+  - [-1, 1, Timm, [128, efficientvit_b0, False, [1, 2, 3]]]
+  - [0, 1, Index, [32, 0]] # P3/8
+  - [0, 1, Index, [64, 1]] # P4/16
+  - [0, 1, Index, [128, 2]] # P5/32
+
+# Top-down FPN; the Detect head trains both one-to-many and one-to-one branches.
+head:
+  - [3, 1, nn.Upsample, [None, 2, nearest]]
+  - [[-1, 2], 1, Concat, [1]]
+  - [-1, 1, C3k2, [128, False]] # P4/16
+  - [-1, 1, nn.Upsample, [None, 2, nearest]]
+  - [[-1, 1], 1, Concat, [1]]
+  - [-1, 1, C3k2, [64, False]] # P3/8
+  - [[9, 6, 3], 1, Detect, [nc]] # P3/8, P4/16, P5/32

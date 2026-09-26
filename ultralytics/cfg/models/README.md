@@ -77,6 +77,12 @@ model = YOLO("examples/yolo11-timm-convnext.yaml")
 model.train(data="coco8.yaml", epochs=100)
 ```
 
+For a smaller backbone with an alternative neck and head, use
+[`examples/yolo11-timm-efficientvit-fpn.yaml`](../../../examples/yolo11-timm-efficientvit-fpn.yaml). It connects
+EfficientViT-B0 to a top-down FPN and the existing dual-branch `Detect` head (`end2end: True`, `reg_max: 1`).
+Its P3/P4/P5 channels are 32/64/128; update them when changing backbone. For NMS-free one-to-one inference,
+select `nms=False` when predicting or exporting; otherwise the one-to-many branch is used for inference.
+
 ## 🤝 Contribute New Models
 
 Have you developed a novel YOLO variant, experimented with a unique architecture, or achieved state-of-the-art results through specific tuning? We encourage you to share your innovations with the community by contributing to our Models section! Contributions like new model configurations, architectural improvements, or performance optimizations are highly valuable and help enrich the Ultralytics ecosystem.
