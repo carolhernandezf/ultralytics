@@ -53,6 +53,7 @@ __all__ = (
     "RepVGGDW",
     "ResNetLayer",
     "SCDown",
+    "Timm",
     "TorchVision",
 )
 
@@ -1581,6 +1582,38 @@ class SCDown(nn.Module):
             (torch.Tensor): Downsampled output tensor.
         """
         return self.cv2(self.cv1(x))
+
+
+class Timm(nn.Module):
+    """Load multi-scale feature maps from a timm backbone for use with Index layers.
+
+    Args:
+        model (str): Name of a timm model supporting ``features_only``.
+        pretrained (bool): Whether to load pretrained weights. Default is False.
+        out_indices (tuple[int, ...]): Feature levels to return. Default is (2, 3, 4).
+        model_kwargs (dict, optional): Additional timm model options. Default is None.
+    """
+
+    def __init__(
+        self,
+        model: str,
+        pretrained: bool = False,
+        out_indices: tuple[int, ...] = (2, 3, 4),
+        model_kwargs: dict | None = None,
+    ):
+        """Initialize the timm feature extractor."""
+        import timm  # scope for faster 'import ultralytics'
+
+        super().__init__()
+        self.m = timm.create_model(
+            model, pretrained=pretrained, features_only=True, out_indices=out_indices, **(model_kwargs or {})
+        )
+        self.channels_last = getattr(self.m, "output_fmt", None) == "NHWC"
+
+    def forward(self, x: torch.Tensor) -> list[torch.Tensor]:
+        """Return the selected backbone feature maps."""
+        features = self.m(x)
+        return [feature.permute(0, 3, 1, 2) for feature in features] if self.channels_last else features
 
 
 class TorchVision(nn.Module):

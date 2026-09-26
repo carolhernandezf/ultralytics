@@ -83,6 +83,7 @@ dependencies = [
 
 # Optional dependencies ------------------------------------------------------------------------------------------------
 [project.optional-dependencies]
+timm = ["timm>=0.9.0"]
 dev = [
     "ipython",
     "pytest",
