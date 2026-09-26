@@ -63,6 +63,12 @@ ConvNeXt-Tiny feature maps at strides 8, 16, and 32 for detection. Set the `Timm
 defaults to `False` so it can be built offline. To swap backbones, choose a timm model that supports `features_only`,
 and update its `out_indices` and the `Index` layer channel counts to match `model.feature_info.channels()` and
 `model.feature_info.reduction()`. For example, EfficientNet-B0 uses indices `[2, 3, 4]` with channels `[40, 112, 320]`.
+ResNet50, RegNetY, MobileNetV3, MobileViT, MaxViT, RepVGG, ConvNeXtV2, EfficientViT, EdgeNeXt, and Swin also expose
+multi-scale features; check each model's indices and channel counts before using it. The `Timm` layer converts timm's
+channels-last feature maps (such as Swin's) to the channels-first layout expected by YOLO. For Swin-Tiny, use
+`[768, swin_tiny_patch4_window7_224, False, [1, 2, 3], {strict_img_size: False}]` to allow variable YOLO image sizes.
+Some models, such as MaxViT, still impose window-size constraints on input dimensions. Models whose selected features
+all have the same stride (such as ViT with three stride-16 outputs) need a different neck configuration.
 
 ```python
 from ultralytics import YOLO
